@@ -1,5 +1,6 @@
 .App {
-  text-align: center;
+  text-align: left;
+  background-color: #282c34;
 }
 
 .App-logo {
@@ -20,6 +21,34 @@
 
 .App-link {
   color: #61dafb;
+}
+
+.Container {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.StickerForm label{
+  flex: 1;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+}
+
+input[type="file"] {
+  text-align: right !important;
+}
+
+.JSONContainer {
+  width: 50%;
 }
 
 @keyframes App-logo-spin {
