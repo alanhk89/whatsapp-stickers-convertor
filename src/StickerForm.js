@@ -75,59 +75,33 @@ class StickerForm extends Component {
     );
   };
 
+  renderFormInputItem = (label, varName, msg) => {
+    const { getFieldDecorator } = this.props.form;
+    return (
+      <FormItem
+        {...formItemLayout}
+        label={label}
+      >
+        {getFieldDecorator(varName, {
+          rules: [{
+            required: true, message: msg,
+          }],
+        })(
+          <Input onChange={this.updateInputValue} />
+        )}
+      </FormItem>
+    );
+  };
+
   render() {
     const { getFieldDecorator } = this.props.form;
     const { tray_image } = this.state;
     return (
       <Form className="StickerForm" onSubmit={this.handleSubmit}>
-        <FormItem
-          {...formItemLayout}
-          label="JSON name"
-        >
-          {getFieldDecorator('file_name', {
-            rules: [{
-              required: true, message: 'Please input your json file name!',
-            }],
-          })(
-            <Input onChange={this.updateInputValue} />
-          )}
-        </FormItem>
-        <FormItem
-          {...formItemLayout}
-          label="Identifier"
-        >
-          {getFieldDecorator('identifier', {
-            rules: [{
-              required: true, message: 'Please input your identifier!',
-            }],
-          })(
-            <Input onChange={this.updateInputValue} />
-          )}
-        </FormItem>
-        <FormItem
-          {...formItemLayout}
-          label="Name"
-        >
-          {getFieldDecorator('name', {
-            rules: [{
-              required: true, message: 'Please input your name!',
-            }],
-          })(
-            <Input onChange={this.updateInputValue} />
-          )}
-        </FormItem>
-        <FormItem
-          {...formItemLayout}
-          label="Publisher"
-        >
-          {getFieldDecorator('publisher', {
-            rules: [{
-              required: true, message: 'Please input your publisher!',
-            }],
-          })(
-            <Input onChange={this.updateInputValue} />
-          )}
-        </FormItem>
+        {this.renderFormInputItem("JSON name", "file_name", 'Please input your json file name!')}
+        {this.renderFormInputItem("Identifier", "identifier", 'Please input your identifier!')}
+        {this.renderFormInputItem("Name", "name", 'Please input your name!')}
+        {this.renderFormInputItem("Publisher", "publisher", 'Please input your publisher!')}
         <FormItem
           {...formItemLayout}
           label="Tray Image">
