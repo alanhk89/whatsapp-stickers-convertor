@@ -29,7 +29,7 @@ class StickerForm extends Component {
     };
   }
 
-  getBase64 = (file, callback) => {
+  getImageInBase64 = (file, callback) => {
     const reader = new FileReader();
     reader.addEventListener('load', () => callback(reader.result.split(',')[1]));
     reader.readAsDataURL(file);
@@ -38,17 +38,18 @@ class StickerForm extends Component {
   generateStickersBase64 = (fileList) => {
     let stickers = [];
     fileList.map((file) => {
-      this.getBase64(file.originFileObj, imageBase64 => stickers.push({image_data: imageBase64}));
+      this.getImageInBase64(file.originFileObj, imageBase64 => stickers.push({image_data: imageBase64}));
     });
     return stickers;
   };
 
   handleSubmit = (evt) => {
     evt.preventDefault();
-    const { identifier, name, publisher, trayImage, stickers, file_name } = this.state;
-    const jsonResult = JSON.stringify({identifier, name, publisher, tray_image: trayImage, stickers});
+    console.log(this.state);
+    const { identifier, name, publisher, tray_image, stickers, file_name } = this.state;
+    const jsonResult = JSON.stringify({identifier, name, publisher, tray_image, stickers});
     const file = new Blob([jsonResult], {type: "application/json;charset=utf-8"});
-    file_name !== '' ? saveAs.saveAs(file, `${file_name}.json`) : message.error('Please enter a file name');
+    /*identifier && name && publisher && trayImage && stickers &&*/ file_name ? saveAs.saveAs(file, `${file_name}.json`) : message.error('Please enter all required values');
   }
 
   updateInputValue = (evt) => {
@@ -95,7 +96,7 @@ class StickerForm extends Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { tray_image } = this.state;
+    const { tray_image, previewVisible, previewImage } = this.state;
     return (
       <Form className="StickerForm" onSubmit={this.handleSubmit}>
         {this.renderFormInputItem("JSON name", "file_name", 'Please input your json file name!')}
@@ -116,25 +117,25 @@ class StickerForm extends Component {
                 beforeUpload = {(file) => {
                   if(file.type !== 'image/png') {
                     message.error('Only PNG is allowed');
-                    return false;
                   }
-                }}
-                onRemove={() => {
-                  this.setState({ tray_image: '', previewVisible: false });
+                  return false;
                 }}
                 onChange = {(info) => {console.log(info);
-                  this.getBase64(info.file, imageBase64 => this.setState({
-                    tray_image: imageBase64
-                  }));
-                  this.setState({tray_image: info.fileList[0] || ''});
+                  if (info.file.status === "removed") {
+                    this.setState({ tray_image: '', previewVisible: false });
+                  } else if(info.file.type === 'image/png'){
+                    this.getImageInBase64(info.file, imageBase64 => this.setState({
+                      tray_image: imageBase64
+                    }));
+                  }
                 }}
                 onPreview={this.handlePreview}
                 listType="picture-card"
                 >
                 {tray_image ? null : this.renderUploadButton()}
               </Upload>
-              <Modal visible={this.state.previewVisible} footer={null} onCancel={this.handleCancel}>
-                <img alt="trayImage" style={{ width: '100%' }} src={this.state.previewImage} />
+              <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
+                <img alt="trayImage" style={{ width: '100%' }} src={previewImage} />
               </Modal>
             </div>
           )}
@@ -149,7 +150,7 @@ class StickerForm extends Component {
           })(
             <div>
               <Upload
-                multiple = {false}
+                multiple = {true}
                 beforeUpload = {(file) => {
                   if (file.type !== 'image/webp') {
                     message.error('Only webp is allowed');
@@ -157,10 +158,12 @@ class StickerForm extends Component {
                   return false;
                 }}
                 onRemove={() => {
-                  //this.setState({ tray_image: '', previewVisible: false });
+                  this.setState({ previewVisible: false });
                 }}
                 onChange = {(info) => {
-                  this.setState({ stickers: this.generateStickersBase64(info.fileList) || []});
+                  if(info.file.type === 'image/webp'){
+                    this.setState({ stickers: this.generateStickersBase64(info.fileList) || []});
+                  }
                 }}
                 onPreview={this.handlePreview}
                 listType="picture-card"
